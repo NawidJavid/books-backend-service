@@ -1,8 +1,8 @@
-package com.nawidali.sql_labb_1.model;
+package com.nawidali.sql_labb_2.model;
 
-import com.nawidali.sql_labb_1.model.exceptions.ConnectionException;
-import com.nawidali.sql_labb_1.model.exceptions.InsertException;
-import com.nawidali.sql_labb_1.model.exceptions.SelectException;
+import com.nawidali.sql_labb_2.model.exceptions.ConnectionException;
+import com.nawidali.sql_labb_2.model.exceptions.InsertException;
+import com.nawidali.sql_labb_2.model.exceptions.SelectException;
 
 import java.sql.Connection;
 import java.sql.Date;
