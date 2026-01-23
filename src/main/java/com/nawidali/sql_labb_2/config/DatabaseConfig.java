@@ -14,13 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for database selection.
- * 
- * Design decision: Use @ConditionalOnProperty to select between MySQL and MongoDB
- * implementations based on application.properties. This keeps the REST layer
- * decoupled from concrete database implementations.
- * 
- * Set books.db.type=mysql or books.db.type=mongo in application.properties.
+ * Selects database implementation based on books.db.type property.
  */
 @Configuration
 public class DatabaseConfig {
@@ -30,40 +24,25 @@ public class DatabaseConfig {
     @Value("${books.db.url}")
     private String databaseUrl;
 
-    /**
-     * MySQL implementation bean.
-     * Created only when books.db.type=mysql.
-     */
     @Bean
     @ConditionalOnProperty(name = "books.db.type", havingValue = "mysql")
     public IBooksDb mysqlDatabase() {
-        log.info("Initializing MySQL database connection");
+        log.info("Using MySQL database");
         return new BooksDbMySql();
     }
 
-    /**
-     * MongoDB implementation bean.
-     * Created only when books.db.type=mongo.
-     */
     @Bean
     @ConditionalOnProperty(name = "books.db.type", havingValue = "mongo")
     public IBooksDb mongoDatabase() {
-        log.info("Initializing MongoDB database connection");
+        log.info("Using MongoDB database");
         return new BooksDbMongo();
     }
 
-    /**
-     * Wrapper that manages the connection lifecycle.
-     * Connects on startup and disconnects on shutdown.
-     */
     @Bean
     public DatabaseConnectionManager connectionManager(IBooksDb database) {
         return new DatabaseConnectionManager(database, databaseUrl);
     }
 
-    /**
-     * Inner class to handle connection lifecycle with Spring's @PostConstruct/@PreDestroy.
-     */
     public static class DatabaseConnectionManager {
 
         private static final Logger log = LoggerFactory.getLogger(DatabaseConnectionManager.class);
@@ -79,7 +58,7 @@ public class DatabaseConfig {
         public void connect() throws ConnectionException {
             log.info("Connecting to database...");
             database.connect(databaseUrl);
-            log.info("Database connection established");
+            log.info("Database connected");
         }
 
         @PreDestroy
@@ -87,9 +66,8 @@ public class DatabaseConfig {
             log.info("Disconnecting from database...");
             try {
                 database.disconnect();
-                log.info("Database disconnected");
             } catch (ConnectionException e) {
-                log.warn("Error during disconnect: {}", e.getMessage());
+                log.warn("Disconnect error: {}", e.getMessage());
             }
         }
     }

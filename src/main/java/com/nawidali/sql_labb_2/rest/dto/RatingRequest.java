@@ -4,12 +4,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-/**
- * DTO for rating request body.
- * 
- * Design decision: Use a dedicated DTO instead of exposing domain models directly.
- * This allows independent evolution of API contracts and domain models.
- */
 public class RatingRequest {
 
     @NotNull(message = "userId is required")
@@ -20,7 +14,6 @@ public class RatingRequest {
     @Max(value = 5, message = "Rating must be between 1 and 5")
     private Integer rating;
 
-    // Default constructor for JSON deserialization
     public RatingRequest() {
     }
 
