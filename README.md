@@ -62,13 +62,53 @@ curl -X POST "http://localhost:8080/books/1/rating" \
 curl "http://localhost:8080/books/1/reviews"
 ```
 
-## Docker
+## Docker Compose (Recommended)
+
+Start the complete demo with one command:
+
+### Option 1: MySQL (default)
 
 ```bash
-# Build
+docker-compose up --build
+```
+
+### Option 2: MongoDB
+
+```bash
+docker-compose -f docker-compose.mongo.yml up --build
+```
+
+Both options spin up:
+- Database with pre-loaded sample data (6 books, 8 authors, reviews, ratings)
+- The Spring Boot API on http://localhost:8080
+
+Stop with `Ctrl+C` or `docker-compose down`.
+
+### Try the API
+
+```bash
+# Search for Java books
+curl "http://localhost:8080/books?title=java"
+
+# Get Effective Java by ISBN
+curl "http://localhost:8080/books/978-0-13-468599-1"
+
+# Rate a book (userId 1 = admin)
+curl -X POST "http://localhost:8080/books/1/rating" \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 1, "rating": 5}'
+
+# Get reviews for Effective Java
+curl "http://localhost:8080/books/1/reviews"
+```
+
+## Docker (Manual)
+
+```bash
+# Build image
 docker build -t books-backend-service .
 
-# Run
+# Run (requires external MySQL)
 docker run -p 8080:8080 \
   -e BOOKS_DB_TYPE=mysql \
   -e BOOKS_DB_URL="jdbc:mysql://host.docker.internal:3306/booksdb?user=root&password=root" \

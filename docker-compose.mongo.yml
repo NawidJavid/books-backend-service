@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: books-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: booksdb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+      - ./init-db-mongo:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  books-api:
+    build: .
+    container_name: books-api
+    ports:
+      - "8080:8080"
+    environment:
+      BOOKS_DB_TYPE: mongo
+      BOOKS_DB_URL: mongodb://appuser:apppass@mongodb:27017/booksdb?authSource=booksdb
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    restart: on-failure
+
+volumes:
+  mongo-data:
+
